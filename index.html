@@ -123,9 +123,44 @@
     padding: 20px;
     font-size: 16px;
   }
+  
+ .print-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    background-color: #002060;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+
+  .print-button:hover {
+    background-color: #003080;
+  }
+
+  .print-button:active {
+    background-color: #001040;
+  }
+
+  @media print {
+    .print-button {
+      display: none;
+    }
+  }
+  
 </style>
 </head>
 <body>
+    
+    <!-- Print Button -->
+  <button class="print-button" onclick="window.print()">🖨️ Print</button>
+    
   <div class="container" id="documentContainer">
     <!-- Header -->
     <div class="header">
