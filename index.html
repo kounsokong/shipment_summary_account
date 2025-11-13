@@ -355,12 +355,12 @@
         expenses.forEach((expense) => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${expense.date || expense.invoice_date || ''}</td>
-            <td>${expense.vendor || expense.vendors || ''}</td>
-            <td>${expense.description || expense.item_name || expense.expense_account || ''}</td>
+            <td>${expense.date || ''}</td>
+            <td>${expense.vendor || ''}</td>
+            <td>${expense.description || ''}</td>
             <td>${expense.selling_amount || ''}</td>
-            <td>${expense.buying_amount || expense.expense_amount || ''}</td>
-            <td>${expense.profit || expense.buying_profit || ''}</td>
+            <td>${expense.buying_amount || ''}</td>
+            <td>${expense.profit || ''}</td>
           `;
           expenseTableBody.appendChild(row);
         });
