@@ -221,16 +221,16 @@
     <!-- Container -->
     <table>
       <tr>
-        <th colspan="7" class="align-center section-title">CONTAINER</th>
+        <th colspan="6" class="align-center section-title">CONTAINER</th>
       </tr>
       <tr>
-        <th>No</th>
-        <th>CONTAINER#</th>
-        <th>CARRIER NAME</th>
-        <th>BUYING</th>
-        <th>SELLING</th>
-        <th>DEPOSIT</th>
-        <th>STATUS</th>
+        <th style="width: 5%; text-align: center;">No</th>
+        <th style="width: 20%; text-align: center;">CONTAINER#</th>
+        <th style="width: 20%; text-align: center;">CARRIER NAME</th>
+        <th style="width: 20%; text-align: center;">BUYING</th>
+        <th style="width: 20%; text-align: center;">SELLING</th>
+        <th style="width: 5%; text-align: center;">DEPOSIT</th>
+
       </tr>
       <tbody id="containerTableBody">
         <!-- Container rows will be inserted here -->
@@ -324,13 +324,12 @@
         containers.forEach((container, index) => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${container.container_no || ''}<br>${container.size || ''}</td>
-            <td>${container.carrier_name || ''}<br>${container.seal_no || ''}</td>
-            <td>${container.buying || ''}</td>
-            <td>${container.selling || ''}</td>
-            <td>${container.deposit || ''}</td>
-            <td>${container.status || ''}</td>
+            <td style="text-align: center;">${index + 1}</td>
+            <td style="text-align: left;">${container.container_no || ''}<br>${container.size || ''}</td>
+            <td style="text-align: left;">${container.carrier_name || ''}<br>${container.seal_no || ''}</td>
+            <td style="text-align: left;">${container.buying || ''}</td>
+            <td style="text-align: left;">${container.selling || ''}</td>
+            <td style="text-align: right;">${container.deposit || ''}</td>
           `;
           containerTableBody.appendChild(row);
         });
@@ -341,7 +340,6 @@
           <td></td>
           <td><br></td>
           <td><br></td>
-          <td></td>
           <td></td>
           <td></td>
           <td></td>
