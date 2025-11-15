@@ -243,12 +243,12 @@
         <th colspan="6" class="align-center section-title">EXPENSE</th>
       </tr>
       <tr>
-        <th>DATE</th>
-        <th>VENDOR</th>
-        <th>DESCRIPTION</th>
-        <th>SELLING</th>
-        <th>BUYING</th>
-        <th>PROFIT</th>
+        <th style="width: 10%; text-align: center;">DATE</th>
+        <th style="width: 20%; text-align: center;">VENDOR</th>
+        <th style="width: 35%; text-align: center;">DESCRIPTION</th>
+        <th style="width: 10%; text-align: center;">SELLING</th>
+        <th style="width: 10%; text-align: center;">BUYING</th>
+        <th style="width: 15%; text-align: center;">PROFIT</th>
       </tr>
       <tbody id="expenseTableBody">
         <!-- Expense rows will be inserted here -->
@@ -355,12 +355,12 @@
         expenses.forEach((expense) => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${expense.date || ''}</td>
-            <td>${expense.vendor || ''}</td>
-            <td>${expense.description || ''}</td>
-            <td>${expense.selling_amount || ''}</td>
-            <td>${expense.buying_amount || ''}</td>
-            <td>${expense.profit || ''}</td>
+            <td style="text-align: center;">${expense.date || ''}</td>
+            <td style="text-align: left;">${expense.vendor || ''}</td>
+            <td style="text-align: left;">${expense.description || ''}</td>
+            <td style="text-align: right;">${expense.selling_amount || ''}</td>
+            <td style="text-align: right;">${expense.buying_amount || ''}</td>
+            <td style="text-align: right;">${expense.profit || ''}</td>
           `;
           expenseTableBody.appendChild(row);
         });
