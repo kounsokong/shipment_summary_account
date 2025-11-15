@@ -207,8 +207,8 @@
     <!-- Special Case -->
     <table>
       <tr>
-        <th style="width: 50%; class="align-center">SPECIAL CASE</th>
-        <th style="width: 50%; class="align-center">REMARKS SELL FACTORY</th>
+        <th style="width: 50%;" class="align-center">SPECIAL CASE</th>
+        <th style="width: 50%;" class="align-center">REMARKS SELL FACTORY</th>
       </tr>
       <tr>
         <td id="special_case"></td>
@@ -348,48 +348,44 @@
       }
 
       // Populate expense table
-        const expenseTableBody = document.getElementById('expenseTableBody');
-        const expenses1 = parseJsonParam(params.expenses1 || '[]');
-        const expenses2 = parseJsonParam(params.expenses2 || '[]');
-
-    // Add first list of expenses
-    if (expenses1.length > 0) {
-      expenses1.forEach((expense) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-      <td>${expense.date || expense.invoice_date || ''}</td>
-      <td>${expense.vendor || expense.vendors || ''}</td>
-      <td>${expense.description || expense.item_name || expense.expense_account || ''}</td>
-      <td>${expense.selling_amount || ''}</td>
-      <td>${expense.buying_amount || expense.expense_amount || ''}</td>
-      <td>${expense.profit || expense.buying_profit || ''}</td>
-    `;
-    expenseTableBody.appendChild(row);
-  });
-}
-
-// Add second list of expenses
-if (expenses2.length > 0) {
-  expenses2.forEach((expense) => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${expense.date || expense.invoice_date || ''}</td>
-      <td>${expense.vendor || expense.vendors || ''}</td>
-      <td>${expense.description || expense.item_name || expense.expense_account || ''}</td>
-      <td>${expense.selling_amount || ''}</td>
-      <td>${expense.buying_amount || expense.expense_amount || ''}</td>
-      <td>${expense.profit || expense.buying_profit || ''}</td>
-    `;
-    expenseTableBody.appendChild(row);
-  });
-```
-
-**URL Parameter Format:**
-```
-&expenses1=[{...}]&expenses2=[{...}]
-  
-      } else {
-        // Default empty rows if no data
+      const expenseTableBody = document.getElementById('expenseTableBody');
+      const expenses1 = parseJsonParam(params.expenses1 || '[]');
+      const expenses2 = parseJsonParam(params.expenses2 || '[]');
+      
+      // Add first list of expenses
+      if (expenses1.length > 0) {
+        expenses1.forEach((expense) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td style="text-align: center;">${expense.date || ''}</td>
+            <td style="text-align: left;">${expense.vendor || ''}</td>
+            <td style="text-align: left;">${expense.description || ''}</td>
+            <td style="text-align: right;">${expense.selling_amount || ''}</td>
+            <td style="text-align: right;">${expense.buying_amount || ''}</td>
+            <td style="text-align: right;">${expense.profit || ''}</td>
+          `;
+          expenseTableBody.appendChild(row);
+        });
+      }
+      
+      // Add second list of expenses
+      if (expenses2.length > 0) {
+        expenses2.forEach((expense) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td style="text-align: center;">${expense.date || ''}</td>
+            <td style="text-align: left;">${expense.vendor || ''}</td>
+            <td style="text-align: left;">${expense.description || ''}</td>
+            <td style="text-align: right;">${expense.selling_amount || ''}</td>
+            <td style="text-align: right;">${expense.buying_amount || ''}</td>
+            <td style="text-align: right;">${expense.profit || ''}</td>
+          `;
+          expenseTableBody.appendChild(row);
+        });
+      }
+      
+      // Add default empty rows if both lists are empty
+      if (expenses1.length === 0 && expenses2.length === 0) {
         const row1 = document.createElement('tr');
         row1.innerHTML = `
           <td></td>
