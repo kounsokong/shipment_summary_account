@@ -325,8 +325,8 @@
             <td style="text-align: center;">${index + 1}</td>
             <td style="text-align: left;">${container.container_no || ''}<br>${container.size || ''}</td>
             <td style="text-align: left;">${container.carrier_name || ''}<br>${container.seal_no || ''}</td>
-            <td style="text-align: left;">${container.buying || ''}</td>
-            <td style="text-align: left;">${container.selling || ''}</td>
+            <td style="text-align: left; white-space: pre-wrap; word-wrap: break-word; vertical-align: top;">${container.buying || ''}</td>
+            <td style="text-align: left; white-space: pre-wrap; word-wrap: break-word; vertical-align: top;">${container.selling || ''}</td>
             <td style="text-align: right;">${container.deposit || ''}</td>
           `;
           containerTableBody.appendChild(row);
