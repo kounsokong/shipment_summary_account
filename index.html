@@ -322,8 +322,16 @@
         containers.forEach((container, index) => {
           const row = document.createElement('tr');
 
-          const buyingFormatted = (container.buying || '').replace(/\n/g, '<br>');
-          const sellingFormatted = (container.selling || '').replace(/\n/g, '<br>');
+          const buyingFormatted = (container.buying || '')
+            .replace(/\\n/g, '<br>')  // Handle escaped \n
+            .replace(/\r\n/g, '<br>') // Handle Windows line breaks
+            .replace(/\n/g, '<br>')   // Handle Unix line breaks
+            .replace(/\r/g, '<br>');  // Handle Mac line breaks
+          const sellingFormatted = (container.selling || '')
+            .replace(/\\n/g, '<br>')
+            .replace(/\r\n/g, '<br>')
+            .replace(/\n/g, '<br>')
+            .replace(/\r/g, '<br>');
           
           row.innerHTML = `
             <td style="text-align: center;">${index + 1}</td>
