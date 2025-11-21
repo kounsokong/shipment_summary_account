@@ -321,12 +321,16 @@
       if (containers.length > 0) {
         containers.forEach((container, index) => {
           const row = document.createElement('tr');
+
+          const buyingFormatted = (container.buying || '').replace(/\n/g, '<br>');
+          const sellingFormatted = (container.selling || '').replace(/\n/g, '<br>');
+          
           row.innerHTML = `
             <td style="text-align: center;">${index + 1}</td>
             <td style="text-align: left;">${container.container_no || ''}<br>${container.size || ''}</td>
             <td style="text-align: left;">${container.carrier_name || ''}<br>${container.seal_no || ''}</td>
-            <td style="text-align: left; white-space: pre-wrap; word-wrap: break-word; vertical-align: top;">${container.buying || ''}</td>
-            <td style="text-align: left; white-space: pre-wrap; word-wrap: break-word; vertical-align: top;">${container.selling || ''}</td>
+            <td style="text-align: left; word-wrap: break-word; vertical-align: top;">${buyingFormatted}</td>
+            <td style="text-align: left; word-wrap: break-word; vertical-align: top;">${sellingFormatted}</td>
             <td style="text-align: right;">${container.deposit || ''}</td>
           `;
           containerTableBody.appendChild(row);
