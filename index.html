@@ -263,7 +263,8 @@
       const params = new URLSearchParams(window.location.search);
       const data = {};
       for (const [key, value] of params) {
-        data[key] = decodeURIComponent(value);
+        // URLSearchParams already decodes once, so just use the value directly
+        data[key] = value;
       }
       return data;
     }
