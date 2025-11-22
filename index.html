@@ -116,6 +116,9 @@
     .container {
       max-width: 100%;
     }
+    .print-button {
+      display: none;
+    }
   }
 
   .loading {
@@ -146,12 +149,6 @@
 
   .print-button:active {
     background-color: #001040;
-  }
-
-  @media print {
-    .print-button {
-      display: none;
-    }
   }
   
 </style>
@@ -209,8 +206,8 @@
         <th style="width: 50%;" class="align-center">REMARKS SELL FACTORY</th>
       </tr>
       <tr>
-        <td id="special_case" style="white-space: pre-wrap;"></td>
-        <td id="remark_sell_factory" style="white-space: pre-wrap;"></td>
+        <td id="special_case" style="white-space: pre-wrap; word-wrap: break-word; vertical-align: top;"></td>
+        <td id="remark_sell_factory" style="white-space: pre-wrap; word-wrap: break-word; vertical-align: top;"></td>
       </tr>
     </table>
 
@@ -253,9 +250,9 @@
       </tbody>
       <tr class="bold">
         <td colspan="3" class="right">TOTAL</td>
-        <td id="revenue" class="right"></td>
-        <td id="operating_expense" class="right"></td>
-        <td id="gross_profit" class="right"></td>
+        <td id="revenue" style="text-align: right;"></td>
+        <td id="operating_expense" style="text-align: right;"></td>
+        <td id="gross_profit" style="text-align: right;"></td>
       </tr>
     </table>
   </div>
@@ -288,18 +285,6 @@
       }
     }
 
-    // Function to handle line breaks in text
-  function formatLineBreaks(text) {
-  if (!text) return '';
-  // Handle all possible line break formats
-  return text
-    .replace(/\\n/g, '<br>')  // Escaped \n from JSON
-    .replace(/\r\n/g, '<br>') // Windows
-    .replace(/\n/g, '<br>')   // Unix
-    .replace(/\r/g, '<br>')   // Mac
-    .replace(/<br>+/g, '<br>'); // Remove multiple consecutive breaks
-}
-
     // Function to populate the document
     function populateDocument() {
       const params = getUrlParams();
@@ -331,50 +316,49 @@
       const containers = parseJsonParam(params.containers || '[]');
       
       if (containers.length > 0) {
-containers.forEach((container, index) => {
-  const row = document.createElement('tr');
-  
-  // Create each cell individually
-  const cell1 = document.createElement('td');
-  cell1.style.textAlign = 'center';
-  cell1.textContent = index + 1;
-  
-  const cell2 = document.createElement('td');
-  cell2.style.textAlign = 'left';
-  cell2.innerHTML = `${container.container_no || ''}<br>${container.size || ''}`;
-  
-  const cell3 = document.createElement('td');
-  cell3.style.textAlign = 'left';
-  cell3.innerHTML = `${container.carrier_name || ''}<br>${container.seal_no || ''}`;
-  
-  const cell4 = document.createElement('td');  // BUYING CELL
-  cell4.style.textAlign = 'left';
-  cell4.style.wordWrap = 'break-word';
-  cell4.style.verticalAlign = 'top';
-  cell4.style.whiteSpace = 'pre-wrap';  // KEY: Preserves line breaks
-  cell4.textContent = container.buying || '';  // KEY: Use textContent not innerHTML
-  
-  const cell5 = document.createElement('td');  // SELLING CELL
-  cell5.style.textAlign = 'left';
-  cell5.style.wordWrap = 'break-word';
-  cell5.style.verticalAlign = 'top';
-  cell5.style.whiteSpace = 'pre-wrap';  // KEY: Preserves line breaks
-  cell5.textContent = container.selling || '';  // KEY: Use textContent not innerHTML
-  
-  const cell6 = document.createElement('td');
-  cell6.style.textAlign = 'right';
-  cell6.textContent = container.deposit || '';
-  
-  // Append all cells to row
-  row.appendChild(cell1);
-  row.appendChild(cell2);
-  row.appendChild(cell3);
-  row.appendChild(cell4);
-  row.appendChild(cell5);
-  row.appendChild(cell6);
-  
-  containerTableBody.appendChild(row);
-});
+        containers.forEach((container, index) => {
+          const row = document.createElement('tr');
+          
+          // Create cells individually to properly handle line breaks
+          const cell1 = document.createElement('td');
+          cell1.style.textAlign = 'center';
+          cell1.textContent = index + 1;
+          
+          const cell2 = document.createElement('td');
+          cell2.style.textAlign = 'left';
+          cell2.innerHTML = `${container.container_no || ''}<br>${container.size || ''}`;
+          
+          const cell3 = document.createElement('td');
+          cell3.style.textAlign = 'left';
+          cell3.innerHTML = `${container.carrier_name || ''}<br>${container.seal_no || ''}`;
+          
+          const cell4 = document.createElement('td');
+          cell4.style.textAlign = 'left';
+          cell4.style.wordWrap = 'break-word';
+          cell4.style.verticalAlign = 'top';
+          cell4.style.whiteSpace = 'pre-line';
+          cell4.textContent = container.buying || '';
+          
+          const cell5 = document.createElement('td');
+          cell5.style.textAlign = 'left';
+          cell5.style.wordWrap = 'break-word';
+          cell5.style.verticalAlign = 'top';
+          cell5.style.whiteSpace = 'pre-line';
+          cell5.textContent = container.selling || '';
+          
+          const cell6 = document.createElement('td');
+          cell6.style.textAlign = 'right';
+          cell6.textContent = container.deposit || '';
+          
+          row.appendChild(cell1);
+          row.appendChild(cell2);
+          row.appendChild(cell3);
+          row.appendChild(cell4);
+          row.appendChild(cell5);
+          row.appendChild(cell6);
+          
+          containerTableBody.appendChild(row);
+        });
       } else {
         // Default empty row if no data
         const row = document.createElement('tr');
