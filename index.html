@@ -263,7 +263,7 @@
       const params = new URLSearchParams(window.location.search);
       const data = {};
       for (const [key, value] of params) {
-        // URLSearchParams already decodes once, so just use the value directly
+        // URLSearchParams automatically decodes URL encoding (%0A becomes newline)
         data[key] = value;
       }
       return data;
@@ -337,15 +337,13 @@
           cell4.style.textAlign = 'left';
           cell4.style.wordWrap = 'break-word';
           cell4.style.verticalAlign = 'top';
-          cell4.style.whiteSpace = 'pre-line';
-          cell4.textContent = container.buying || '';
+          cell4.innerHTML = (container.buying || '').replace(/\n/g, '<br>').replace(/\\n/g, '<br>');
           
           const cell5 = document.createElement('td');
           cell5.style.textAlign = 'left';
           cell5.style.wordWrap = 'break-word';
           cell5.style.verticalAlign = 'top';
-          cell5.style.whiteSpace = 'pre-line';
-          cell5.textContent = container.selling || '';
+          cell5.innerHTML = (container.selling || '').replace(/\n/g, '<br>').replace(/\\n/g, '<br>');
           
           const cell6 = document.createElement('td');
           cell6.style.textAlign = 'right';
