@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,9 +117,6 @@
     .container {
       max-width: 100%;
     }
-    .print-button {
-      display: none;
-    }
   }
 
   .loading {
@@ -149,6 +147,12 @@
 
   .print-button:active {
     background-color: #001040;
+  }
+
+  @media print {
+    .print-button {
+      display: none;
+    }
   }
   
 </style>
@@ -206,8 +210,8 @@
         <th style="width: 50%;" class="align-center">REMARKS SELL FACTORY</th>
       </tr>
       <tr>
-        <td id="special_case" style="white-space: pre-wrap; word-wrap: break-word; vertical-align: top;"></td>
-        <td id="remark_sell_factory" style="white-space: pre-wrap; word-wrap: break-word; vertical-align: top;"></td>
+        <td id="special_case" style="white-space: pre-wrap;"></td>
+        <td id="remark_sell_factory" style="white-space: pre-wrap;"></td>
       </tr>
     </table>
 
@@ -250,9 +254,9 @@
       </tbody>
       <tr class="bold">
         <td colspan="3" class="right">TOTAL</td>
-        <td id="revenue" style="text-align: right;"></td>
-        <td id="operating_expense" style="text-align: right;"></td>
-        <td id="gross_profit" style="text-align: right;"></td>
+        <td id="revenue" class="right"></td>
+        <td id="operating_expense" class="right"></td>
+        <td id="gross_profit" class="right"></td>
       </tr>
     </table>
   </div>
@@ -263,8 +267,7 @@
       const params = new URLSearchParams(window.location.search);
       const data = {};
       for (const [key, value] of params) {
-        // URLSearchParams automatically decodes URL encoding (%0A becomes newline)
-        data[key] = value;
+        data[key] = decodeURIComponent(value);
       }
       return data;
     }
@@ -319,43 +322,26 @@
       if (containers.length > 0) {
         containers.forEach((container, index) => {
           const row = document.createElement('tr');
+
+          const buyingFormatted = (container.buying || '')
+            .replace(/\\n/g, '<br>')  // Handle escaped \n
+            .replace(/\r\n/g, '<br>') // Handle Windows line breaks
+            .replace(/\n/g, '<br>')   // Handle Unix line breaks
+            .replace(/\r/g, '<br>');  // Handle Mac line breaks
+          const sellingFormatted = (container.selling || '')
+            .replace(/\\n/g, '<br>')
+            .replace(/\r\n/g, '<br>')
+            .replace(/\n/g, '<br>')
+            .replace(/\r/g, '<br>');
           
-          // Create cells individually to properly handle line breaks
-          const cell1 = document.createElement('td');
-          cell1.style.textAlign = 'center';
-          cell1.textContent = index + 1;
-          
-          const cell2 = document.createElement('td');
-          cell2.style.textAlign = 'left';
-          cell2.innerHTML = `${container.container_no || ''}<br>${container.size || ''}`;
-          
-          const cell3 = document.createElement('td');
-          cell3.style.textAlign = 'left';
-          cell3.innerHTML = `${container.carrier_name || ''}<br>${container.seal_no || ''}`;
-          
-          const cell4 = document.createElement('td');
-          cell4.style.textAlign = 'left';
-          cell4.style.wordWrap = 'break-word';
-          cell4.style.verticalAlign = 'top';
-          cell4.innerHTML = (container.buying || '').replace(/\n/g, '<br>').replace(/\\n/g, '<br>');
-          
-          const cell5 = document.createElement('td');
-          cell5.style.textAlign = 'left';
-          cell5.style.wordWrap = 'break-word';
-          cell5.style.verticalAlign = 'top';
-          cell5.innerHTML = (container.selling || '').replace(/\n/g, '<br>').replace(/\\n/g, '<br>');
-          
-          const cell6 = document.createElement('td');
-          cell6.style.textAlign = 'right';
-          cell6.textContent = container.deposit || '';
-          
-          row.appendChild(cell1);
-          row.appendChild(cell2);
-          row.appendChild(cell3);
-          row.appendChild(cell4);
-          row.appendChild(cell5);
-          row.appendChild(cell6);
-          
+          row.innerHTML = `
+            <td style="text-align: center;">${index + 1}</td>
+            <td style="text-align: left;">${container.container_no || ''}<br>${container.size || ''}</td>
+            <td style="text-align: left;">${container.carrier_name || ''}<br>${container.seal_no || ''}</td>
+            <td style="text-align: left; word-wrap: break-word; vertical-align: top;">${buyingFormatted}</td>
+            <td style="text-align: left; word-wrap: break-word; vertical-align: top;">${sellingFormatted}</td>
+            <td style="text-align: right;">${container.deposit || ''}</td>
+          `;
           containerTableBody.appendChild(row);
         });
       } else {
