@@ -5,211 +5,68 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shipment Summary - Angkobodia Logistics Co., Ltd</title>
 <style>
-  @page {
-    size: A4;
-    margin: 10mm;
-  }
-
-  body {
-    font-family: "Arial", "Khmer OS Battambang", sans-serif;
-    font-size: 13px;
-    color: #000;
-    margin: 0;
-    padding: 0;
-  }
-
-  .container {
-    width: 100%;
-    max-width: 210mm;
-    margin: 0 auto;
-    padding: 10px;
-    box-sizing: border-box;
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 2px solid #000;
-    padding-bottom: 8px;
-  }
-
-  .header img {
-    height: 60px;
-  }
-
-  .header-text {
-    text-align: right;
-  }
-
-  .header-text h2 {
-    margin: 0;
-    font-size: 20px;
-    color: #002060;
-  }
-
-  .header-text p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.2;
-  }
-
-  h3.title {
-    text-align: center;
-    margin-top: 10px;
-    font-size: 18px;
-    text-transform: uppercase;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 5px;
-  }
-
-  th, td {
-    border: 1px solid #000;
-    padding: 6px 8px;
-    vertical-align: middle;
-  }
-
-  th {
-    background: #f9f9f9;
-    text-align: left;
-  }
-
-  .no-border td {
-    border: none;
-  }
-
-  .section-title {
-    font-weight: bold;
-    background: #f2f2f2;
-    text-transform: uppercase;
-  }
-
-  .notes {
-    margin-top: 4px;
-    font-size: 12px;
-  }
-
-  .align-center {
-    text-align: center;
-  }
-
-  .right {
-    text-align: right;
-  }
-
-  .bold {
-    font-weight: bold;
-  }
-
-  @media print {
-    body { margin: 0; }
-    .container { max-width: 100%; }
-    .print-button { display: none; }
-  }
-  
- .print-button {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px 24px;
-    background-color: #002060;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 1000;
-  }
+  @page { size: A4; margin: 10mm; }
+  body { font-family: "Arial", "Khmer OS Battambang", sans-serif; font-size: 13px; color: #000; margin: 0; padding: 0; }
+  .container { width: 100%; max-width: 210mm; margin: 0 auto; padding: 10px; box-sizing: border-box; }
+  .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 8px; }
+  .header img { height: 60px; }
+  .header-text { text-align: right; }
+  .header-text h2 { margin: 0; font-size: 20px; color: #002060; }
+  h3.title { text-align: center; margin-top: 10px; font-size: 18px; text-transform: uppercase; }
+  table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+  th, td { border: 1px solid #000; padding: 6px 8px; vertical-align: middle; }
+  th { background: #f9f9f9; text-align: center; }
+  .section-title { font-weight: bold; background: #f2f2f2; text-transform: uppercase; text-align: center; }
+  .notes { margin-top: 4px; font-size: 12px; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
+  .print-button { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background-color: #002060; color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 1000; }
+  @media print { .print-button { display: none; } }
 </style>
 </head>
 <body>
-    
+
   <button class="print-button" onclick="window.print()">🖨️ Print</button>
-    
+
   <div class="container" id="documentContainer">
     <div class="header">
-      <div class="logo">
-        <img src="logo.png" alt="Angkobodia Logistics Logo" onerror="this.style.display='none'">
-      </div>
-      <div class="header-text">
-        <h2>Angkobodia Logistics Co., Ltd</h2>
-      </div>
+      <div class="logo"><img src="logo.png" alt="Logo" onerror="this.style.display='none'"></div>
+      <div class="header-text"><h2>Angkobodia Logistics Co., Ltd</h2></div>
     </div>
 
     <h3 class="title">Shipment Summary</h3>
 
     <table>
-      <tr>
-        <td>DATE: <b id="date"></b></td>
-        <td>BL.: <b id="bill_of_lading"></b></td>
-      </tr>
-      <tr>
-        <td>JOB NO: <b id="lot_no"></b></td>
-        <td>CNTR No: <b id="container_nos"></b></td>
-      </tr>
-      <tr>
-        <td>SHIPMENT MODE: <b id="job_type"></b></td>
-        <td>ETD: <b id="etd"></b></td>
-      </tr>
-      <tr>
-        <td>VOLUME: <b><span id="total_pkg"></span><span id="unit"></span></b></td>
-        <td>INV#: <b id="invoice_no"></b></td>
-      </tr>
-      <tr>
-        <td>GROSS WEIGHT: <b id="total_gw"></b></td>
-        <td>CUSTOMER: <b><span id="customer"></span>: <span id="customer_name"></span></b></td>
-      </tr>
-      <tr>
-        <td>CBM: <b id="cbm"></b></td>
-        <td>OPERATOR: <b id="operator"></b></td>
-      </tr>
+      <tr><td>DATE: <b id="date"></b></td><td>BL.: <b id="bill_of_lading"></b></td></tr>
+      <tr><td>JOB NO: <b id="lot_no"></b></td><td>CNTR No: <b id="container_nos"></b></td></tr>
+      <tr><td>SHIPMENT MODE: <b id="job_type"></b></td><td>ETD: <b id="etd"></b></td></tr>
+      <tr><td>VOLUME: <b><span id="total_pkg"></span><span id="unit"></span></b></td><td>INV#: <b id="invoice_no"></b></td></tr>
+      <tr><td>GROSS WEIGHT: <b id="total_gw"></b></td><td>CUSTOMER: <b><span id="customer"></span>: <span id="customer_name"></span></b></td></tr>
+      <tr><td>CBM: <b id="cbm"></b></td><td>OPERATOR: <b id="operator"></b></td></tr>
     </table>
 
     <table>
-      <tr>
-        <th style="width: 50%;" class="align-center">SPECIAL CASE</th>
-        <th style="width: 50%;" class="align-center">REMARKS SELL FACTORY</th>
-      </tr>
-      <tr>
-        <td id="special_case" style="white-space: pre-wrap;"></td>
-        <td id="remark_sell_factory" style="white-space: pre-wrap;"></td>
-      </tr>
+      <tr><th style="width: 50%;">SPECIAL CASE</th><th style="width: 50%;">REMARKS SELL FACTORY</th></tr>
+      <tr><td id="special_case" style="white-space: pre-wrap;"></td><td id="remark_sell_factory" style="white-space: pre-wrap;"></td></tr>
     </table>
 
     <p class="notes"><b>Notes:</b> <span id="remarks"></span></p>
 
     <table>
-      <tr>
-        <th colspan="6" class="align-center section-title">CONTAINER</th>
-      </tr>
-      <tr>
-        <th style="width: 3%; text-align: center;">No</th>
-        <th style="width: 15%; text-align: center;">CONTAINER#</th>
-        <th style="width: 17%; text-align: center;">CARRIER NAME</th>
-        <th style="width: 30%; text-align: center;">BUYING</th>
-        <th style="width: 30%; text-align: center;">SELLING</th>
-        <th style="width: 5%; text-align: center;">DEPOSIT</th>
-      </tr>
+      <tr><th colspan="6" class="section-title">CONTAINER</th></tr>
+      <tr><th>No</th><th>CONTAINER#</th><th>CARRIER NAME</th><th>BUYING</th><th>SELLING</th><th>DEPOSIT</th></tr>
       <tbody id="containerTableBody"></tbody>
     </table>
 
     <table>
+      <tr><th colspan="6" class="section-title">EXPENSE SUMMARY</th></tr>
       <tr>
-        <th colspan="6" class="align-center section-title">EXPENSE SUMMARY</th>
-      </tr>
-      <tr>
-        <th style="width: 15%; text-align: center;">DATE</th>
-        <th style="width: 20%; text-align: center;">VENDOR</th>
-        <th style="width: 30%; text-align: center;">DESCRIPTION</th>
-        <th style="width: 10%; text-align: center;">SELLING</th>
-        <th style="width: 10%; text-align: center;">BUYING</th>
-        <th style="width: 15%; text-align: center;">PROFIT</th>
+        <th style="width: 12%;">DATE</th>
+        <th style="width: 23%;">VENDOR</th>
+        <th style="width: 30%;">DESCRIPTION</th>
+        <th style="width: 10%;">SELLING</th>
+        <th style="width: 10%;">BUYING</th>
+        <th style="width: 15%;">PROFIT</th>
       </tr>
       <tbody id="expenseTableBody"></tbody>
       <tr class="bold">
@@ -225,114 +82,87 @@
     function getUrlParams() {
       const params = new URLSearchParams(window.location.search);
       const data = {};
-      for (const [key, value] of params) {
-        data[key] = decodeURIComponent(value);
-      }
+      for (const [key, value] of params) { data[key] = decodeURIComponent(value); }
       return data;
     }
 
-    function setElementContent(id, value) {
-      const element = document.getElementById(id);
-      if (element) element.textContent = value || '';
-    }
+    function parseJsonParam(param) { try { return JSON.parse(param); } catch (e) { return []; } }
 
-    function parseJsonParam(param) {
-      try { return JSON.parse(param); } catch (e) { return []; }
-    }
-
-    // Helper to turn strings like "$1,200.50" into 1200.5
-    function cleanNumber(val) {
+    function cleanNum(val) {
       if (!val) return 0;
-      const num = parseFloat(String(val).replace(/[^0-9.-]+/g, ""));
+      let num = parseFloat(String(val).replace(/[^0-9.-]+/g, ""));
       return isNaN(num) ? 0 : num;
     }
 
+    function formatCur(num) {
+      return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
     function populateDocument() {
-      const params = getUrlParams();
+      const p = getUrlParams();
 
-      // Basic Info
-      setElementContent('date', params.date);
-      setElementContent('bill_of_lading', params.bill_of_lading);
-      setElementContent('lot_no', params.lot_no);
-      setElementContent('container_nos', params.container_nos);
-      setElementContent('job_type', params.job_type);
-      setElementContent('etd', params.etd);
-      setElementContent('total_pkg', params.total_pkg);
-      setElementContent('unit', params.unit);
-      setElementContent('invoice_no', params.invoice_no);
-      setElementContent('total_gw', params.total_gw);
-      setElementContent('customer', params.customer);
-      setElementContent('customer_name', params.customer_name);
-      setElementContent('cbm', params.cbm);
-      setElementContent('operator', params.operator);
-      setElementContent('special_case', params.special_case);
-      setElementContent('remark_sell_factory', params.remark_sell_factory);
-      setElementContent('remarks', params.remarks);
-      setElementContent('revenue', params.revenue);
-      setElementContent('operating_expense', params.operating_expense);
-      setElementContent('gross_profit', params.gross_profit);
+      // Basic Text Fields
+      ["date", "bill_of_lading", "lot_no", "container_nos", "job_type", "etd", "total_pkg", "unit", "invoice_no", "total_gw", "customer", "customer_name", "cbm", "operator", "special_case", "remark_sell_factory", "remarks", "revenue", "operating_expense", "gross_profit"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = p[id] || '';
+      });
 
-      // Containers
-      const containerTableBody = document.getElementById('containerTableBody');
-      const containers = parseJsonParam(params.containers || '[]');
-      if (containers.length > 0) {
-        containers.forEach((c, i) => {
-          const row = document.createElement('tr');
-          const buy = (c.buying || '').replace(/\n/g, '<br>');
-          const sell = (c.selling || '').replace(/\n/g, '<br>');
-          row.innerHTML = `
-            <td class="align-center">${i + 1}</td>
-            <td>${c.container_no || ''}<br>${c.size || ''}</td>
-            <td>${c.carrier_name || ''}<br>${c.seal_no || ''}</td>
-            <td style="vertical-align: top;">${buy}</td>
-            <td style="vertical-align: top;">${sell}</td>
-            <td class="right">${c.deposit || ''}</td>
-          `;
-          containerTableBody.appendChild(row);
-        });
-      }
+      // Container Rows
+      const containerBody = document.getElementById('containerTableBody');
+      const containers = parseJsonParam(p.containers);
+      containers.forEach((c, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td style="text-align:center">${i+1}</td><td>${c.container_no||''}<br>${c.size||'' }</td><td>${c.carrier_name||''}<br>${c.seal_no||''}</td><td style="white-space:pre-wrap">${c.buying||''}</td><td style="white-space:pre-wrap">${c.selling||''}</td><td class="right">${c.deposit||''}</td>`;
+        containerBody.appendChild(row);
+      });
 
-      // --- MERGE EXPENSES 1 & 2 BY DESCRIPTION ---
-      const expenseTableBody = document.getElementById('expenseTableBody');
-      const exp1 = parseJsonParam(params.expenses1 || '[]');
-      const exp2 = parseJsonParam(params.expenses2 || '[]');
-      const merged = {};
+      // --- EXPENSE MERGING LOGIC ---
+      const expenseBody = document.getElementById('expenseTableBody');
+      const exp1 = parseJsonParam(p.expenses1); // Table for Selling
+      const exp2 = parseJsonParam(p.expenses2); // Table for Buying
+      
+      const mergedMap = {};
 
-      // Process List 1 (Take Selling)
+      // 1. Process Selling Table (exp1)
       exp1.forEach(item => {
-        const key = item.description || 'Other';
-        if (!merged[key]) {
-          merged[key] = { date: item.date, vendor: item.vendor, desc: key, sell: 0, buy: 0 };
+        const desc = item.description || "N/A";
+        if (!mergedMap[desc]) {
+          mergedMap[desc] = { date: item.date, vendor: item.vendor, description: desc, selling: 0, buying: 0 };
         }
-        merged[key].sell += cleanNumber(item.selling_amount);
+        mergedMap[desc].selling += cleanNum(item.selling_amount);
       });
 
-      // Process List 2 (Take Buying)
+      // 2. Process Buying Table (exp2) - Map buying amounts to the same descriptions
       exp2.forEach(item => {
-        const key = item.description || 'Other';
-        if (!merged[key]) {
-          merged[key] = { date: item.date, vendor: item.vendor, desc: key, sell: 0, buy: 0 };
+        const desc = item.description || "N/A";
+        if (!mergedMap[desc]) {
+          // If description wasn't in Selling table, create new entry
+          mergedMap[desc] = { date: item.date, vendor: item.vendor, description: desc, selling: 0, buying: 0 };
         }
-        merged[key].buy += cleanNumber(item.buying_amount);
+        mergedMap[desc].buying += cleanNum(item.buying_amount);
+        
+        // Use the vendor from the buying table if the selling table didn't have one
+        if (!mergedMap[desc].vendor) mergedMap[desc].vendor = item.vendor;
       });
 
-      const mergedList = Object.values(merged);
-      if (mergedList.length > 0) {
-        mergedList.forEach(item => {
-          const profit = item.sell - item.buy;
+      // 3. Render the merged list
+      const finalItems = Object.values(mergedMap);
+      if (finalItems.length > 0) {
+        finalItems.forEach(item => {
+          const profit = item.selling - item.buying;
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td class="align-center">${item.date || ''}</td>
+            <td style="text-align:center">${item.date || ''}</td>
             <td>${item.vendor || ''}</td>
-            <td>${item.desc}</td>
-            <td class="right">${item.sell.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-            <td class="right">${item.buy.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-            <td class="right">${profit.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td>${item.description}</td>
+            <td class="right">${formatCur(item.selling)}</td>
+            <td class="right">${formatCur(item.buying)}</td>
+            <td class="right">${formatCur(profit)}</td>
           `;
-          expenseTableBody.appendChild(row);
+          expenseBody.appendChild(row);
         });
       } else {
-        expenseTableBody.innerHTML = '<tr><td colspan="6" class="align-center">No data</td></tr>';
+        expenseBody.innerHTML = '<tr><td colspan="6" style="text-align:center">No records found</td></tr>';
       }
     }
 
