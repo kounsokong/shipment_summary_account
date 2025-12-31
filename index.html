@@ -293,7 +293,7 @@
       const merged = [];
       const expenseMap = new Map();
 
-      // Process expenses1 first - sum up all selling amounts for same description
+      // Process expenses1 first - sum up all selling and buying amounts for same description
       expenses1.forEach(expense => {
         const key = expense.description || '';
         
@@ -301,15 +301,20 @@
           const existing = expenseMap.get(key);
           const existingSelling = parseFloat((existing.selling_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           const newSelling = parseFloat((expense.selling_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
+          const existingBuying = parseFloat((existing.buying_from_expense1 || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
+          const newBuying = parseFloat((expense.buying_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
+          
           existing.selling_amount = (existingSelling + newSelling).toFixed(2);
+          existing.buying_from_expense1 = (existingBuying + newBuying).toFixed(2);
         } else {
           expenseMap.set(key, {
             date: expense.date || '',
             vendor: expense.vendor || '',
             description: expense.description || '',
             selling_amount: expense.selling_amount || '',
-            buying_amount: '',
-            profit: ''
+            buying_amount: expense.buying_amount || '',
+            buying_from_expense1: expense.buying_amount || '',
+            profit: expense.profit || ''
           });
         }
       });
@@ -326,7 +331,7 @@
           const existingSelling = parseFloat((existing.selling_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           const newSelling = parseFloat((expense.selling_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           
-          // Get buying_amount from expense2 only
+          // Get buying_amount from expense2 only (replaces expense1 buying)
           const buyingFromExpense2 = parseFloat((expense.buying_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           
           // Calculate total selling and profit
