@@ -105,23 +105,10 @@
     font-weight: bold;
   }
 
-  .no-top-border td {
-    border-top: none;
-  }
-
   @media print {
-    body {
-      margin: 0;
-    }
-    .container {
-      max-width: 100%;
-    }
-  }
-
-  .loading {
-    text-align: center;
-    padding: 20px;
-    font-size: 16px;
+    body { margin: 0; }
+    .container { max-width: 100%; }
+    .print-button { display: none; }
   }
   
  .print-button {
@@ -139,30 +126,13 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     z-index: 1000;
   }
-
-  .print-button:hover {
-    background-color: #003080;
-  }
-
-  .print-button:active {
-    background-color: #001040;
-  }
-
-  @media print {
-    .print-button {
-      display: none;
-    }
-  }
-  
 </style>
 </head>
 <body>
     
-    <!-- Print Button -->
   <button class="print-button" onclick="window.print()">🖨️ Print</button>
     
   <div class="container" id="documentContainer">
-    <!-- Header -->
     <div class="header">
       <div class="logo">
         <img src="logo.png" alt="Angkobodia Logistics Logo" onerror="this.style.display='none'">
@@ -174,7 +144,6 @@
 
     <h3 class="title">Shipment Summary</h3>
 
-    <!-- Shipment Info -->
     <table>
       <tr>
         <td>DATE: <b id="date"></b></td>
@@ -202,7 +171,6 @@
       </tr>
     </table>
 
-    <!-- Special Case -->
     <table>
       <tr>
         <th style="width: 50%;" class="align-center">SPECIAL CASE</th>
@@ -216,7 +184,6 @@
 
     <p class="notes"><b>Notes:</b> <span id="remarks"></span></p>
 
-    <!-- Container -->
     <table>
       <tr>
         <th colspan="6" class="align-center section-title">CONTAINER</th>
@@ -228,17 +195,13 @@
         <th style="width: 30%; text-align: center;">BUYING</th>
         <th style="width: 30%; text-align: center;">SELLING</th>
         <th style="width: 5%; text-align: center;">DEPOSIT</th>
-
       </tr>
-      <tbody id="containerTableBody">
-        <!-- Container rows will be inserted here -->
-      </tbody>
+      <tbody id="containerTableBody"></tbody>
     </table>
 
-    <!-- Expense -->
     <table>
       <tr>
-        <th colspan="6" class="align-center section-title">EXPENSE</th>
+        <th colspan="6" class="align-center section-title">EXPENSE SUMMARY</th>
       </tr>
       <tr>
         <th style="width: 15%; text-align: center;">DATE</th>
@@ -248,9 +211,7 @@
         <th style="width: 10%; text-align: center;">BUYING</th>
         <th style="width: 15%; text-align: center;">PROFIT</th>
       </tr>
-      <tbody id="expenseTableBody">
-        <!-- Expense rows will be inserted here -->
-      </tbody>
+      <tbody id="expenseTableBody"></tbody>
       <tr class="bold">
         <td colspan="3" class="right">TOTAL</td>
         <td id="revenue" class="right"></td>
@@ -261,7 +222,6 @@
   </div>
 
   <script>
-    // Function to get URL parameters
     function getUrlParams() {
       const params = new URLSearchParams(window.location.search);
       const data = {};
@@ -271,68 +231,26 @@
       return data;
     }
 
-    // Function to safely set element content
     function setElementContent(id, value) {
       const element = document.getElementById(id);
-      if (element) {
-        element.textContent = value || '';
-      }
+      if (element) element.textContent = value || '';
     }
 
-    // Function to parse JSON arrays from URL parameters
     function parseJsonParam(param) {
-      try {
-        return JSON.parse(param);
-      } catch (e) {
-        return [];
-      }
+      try { return JSON.parse(param); } catch (e) { return []; }
     }
 
-    // Function to parse amount values
-    function parseAmount(val) {
-      if (!val || val === '') return 0;
-      // Remove currency symbols, commas, and spaces
-      const cleaned = String(val).replace(/[$,\s]/g, '');
-      const parsed = parseFloat(cleaned);
-      return isNaN(parsed) ? 0 : parsed;
+    // Helper to turn strings like "$1,200.50" into 1200.5
+    function cleanNumber(val) {
+      if (!val) return 0;
+      const num = parseFloat(String(val).replace(/[^0-9.-]+/g, ""));
+      return isNaN(num) ? 0 : num;
     }
 
-    // Function to merge duplicate expenses by description (item_name)
-    function mergeExpensesByDescription(expenses) {
-      const mergedMap = new Map();
-      
-      expenses.forEach(expense => {
-        const description = expense.description || '';
-        
-        if (mergedMap.has(description)) {
-          // Merge with existing entry - sum the "amount" field
-          const existing = mergedMap.get(description);
-          existing.selling_amount += parseAmount(expense.selling_amount);
-          existing.buying_amount += parseAmount(expense.buying_amount);
-          existing.profit += parseAmount(expense.profit);
-          existing.amount += parseAmount(expense.amount);
-        } else {
-          // Add new entry
-          mergedMap.set(description, {
-            date: expense.date || '',
-            vendor: expense.vendor || '',
-            description: description,
-            selling_amount: parseAmount(expense.selling_amount),
-            buying_amount: parseAmount(expense.buying_amount),
-            profit: parseAmount(expense.profit),
-            amount: parseAmount(expense.amount)
-          });
-        }
-      });
-      
-      return Array.from(mergedMap.values());
-    }
-
-    // Function to populate the document
     function populateDocument() {
       const params = getUrlParams();
 
-      // Populate single value fields
+      // Basic Info
       setElementContent('date', params.date);
       setElementContent('bill_of_lading', params.bill_of_lading);
       setElementContent('lot_no', params.lot_no);
@@ -354,152 +272,71 @@
       setElementContent('operating_expense', params.operating_expense);
       setElementContent('gross_profit', params.gross_profit);
 
-      // Populate container table
+      // Containers
       const containerTableBody = document.getElementById('containerTableBody');
       const containers = parseJsonParam(params.containers || '[]');
-      
       if (containers.length > 0) {
-        containers.forEach((container, index) => {
+        containers.forEach((c, i) => {
           const row = document.createElement('tr');
-
-          const buyingFormatted = (container.buying || '')
-            .replace(/\\n/g, '<br>')  // Handle escaped \n
-            .replace(/\r\n/g, '<br>') // Handle Windows line breaks
-            .replace(/\n/g, '<br>')   // Handle Unix line breaks
-            .replace(/\r/g, '<br>');  // Handle Mac line breaks
-          const sellingFormatted = (container.selling || '')
-            .replace(/\\n/g, '<br>')
-            .replace(/\r\n/g, '<br>')
-            .replace(/\n/g, '<br>')
-            .replace(/\r/g, '<br>');
-          
+          const buy = (c.buying || '').replace(/\n/g, '<br>');
+          const sell = (c.selling || '').replace(/\n/g, '<br>');
           row.innerHTML = `
-            <td style="text-align: center;">${index + 1}</td>
-            <td style="text-align: left;">${container.container_no || ''}<br>${container.size || ''}</td>
-            <td style="text-align: left;">${container.carrier_name || ''}<br>${container.seal_no || ''}</td>
-            <td style="text-align: left; word-wrap: break-word; vertical-align: top;">${buyingFormatted}</td>
-            <td style="text-align: left; word-wrap: break-word; vertical-align: top;">${sellingFormatted}</td>
-            <td style="text-align: right;">${container.deposit || ''}</td>
+            <td class="align-center">${i + 1}</td>
+            <td>${c.container_no || ''}<br>${c.size || ''}</td>
+            <td>${c.carrier_name || ''}<br>${c.seal_no || ''}</td>
+            <td style="vertical-align: top;">${buy}</td>
+            <td style="vertical-align: top;">${sell}</td>
+            <td class="right">${c.deposit || ''}</td>
           `;
           containerTableBody.appendChild(row);
         });
-      } else {
-        // Default empty row if no data
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td></td>
-          <td><br></td>
-          <td><br></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        `;
-        containerTableBody.appendChild(row);
       }
 
-      // Populate expense table
+      // --- MERGE EXPENSES 1 & 2 BY DESCRIPTION ---
       const expenseTableBody = document.getElementById('expenseTableBody');
-      const expenses1 = parseJsonParam(params.expenses1 || '[]');
-      const expenses2 = parseJsonParam(params.expenses2 || '[]');
-      
-      // Merge expenses1 by description
-      const mergedExpenses1 = mergeExpensesByDescription(expenses1);
-      
-      // Add merged expenses1
-      if (mergedExpenses1.length > 0) {
-        mergedExpenses1.forEach((expense) => {
+      const exp1 = parseJsonParam(params.expenses1 || '[]');
+      const exp2 = parseJsonParam(params.expenses2 || '[]');
+      const merged = {};
+
+      // Process List 1 (Take Selling)
+      exp1.forEach(item => {
+        const key = item.description || 'Other';
+        if (!merged[key]) {
+          merged[key] = { date: item.date, vendor: item.vendor, desc: key, sell: 0, buy: 0 };
+        }
+        merged[key].sell += cleanNumber(item.selling_amount);
+      });
+
+      // Process List 2 (Take Buying)
+      exp2.forEach(item => {
+        const key = item.description || 'Other';
+        if (!merged[key]) {
+          merged[key] = { date: item.date, vendor: item.vendor, desc: key, sell: 0, buy: 0 };
+        }
+        merged[key].buy += cleanNumber(item.buying_amount);
+      });
+
+      const mergedList = Object.values(merged);
+      if (mergedList.length > 0) {
+        mergedList.forEach(item => {
+          const profit = item.sell - item.buy;
           const row = document.createElement('tr');
-          
-          // Determine which amount to display based on data availability
-          let sellingDisplay = '';
-          let buyingDisplay = '';
-          let profitDisplay = '';
-          
-          // Check if we have selling_amount, buying_amount, profit fields
-          if (expense.selling_amount !== 0) {
-            sellingDisplay = expense.selling_amount.toFixed(2);
-          }
-          if (expense.buying_amount !== 0) {
-            buyingDisplay = expense.buying_amount.toFixed(2);
-          }
-          if (expense.profit !== 0) {
-            profitDisplay = expense.profit.toFixed(2);
-          }
-          
-          // If amount field exists and is non-zero, use it for the appropriate column
-          if (expense.amount !== 0 && sellingDisplay === '') {
-            sellingDisplay = expense.amount.toFixed(2);
-          }
-          
           row.innerHTML = `
-            <td style="text-align: center;">${expense.date}</td>
-            <td style="text-align: left;">${expense.vendor}</td>
-            <td style="text-align: left;">${expense.description}</td>
-            <td style="text-align: right;">${sellingDisplay}</td>
-            <td style="text-align: right;">${buyingDisplay}</td>
-            <td style="text-align: right;">${profitDisplay}</td>
+            <td class="align-center">${item.date || ''}</td>
+            <td>${item.vendor || ''}</td>
+            <td>${item.desc}</td>
+            <td class="right">${item.sell.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td class="right">${item.buy.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td class="right">${profit.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
           `;
           expenseTableBody.appendChild(row);
         });
-      }
-      
-      // Add second list of expenses (not merged)
-      if (expenses2.length > 0) {
-        expenses2.forEach((expense) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td style="text-align: center;">${expense.date || ''}</td>
-            <td style="text-align: left;">${expense.vendor || ''}</td>
-            <td style="text-align: left;">${expense.description || ''}</td>
-            <td style="text-align: right;">${expense.selling_amount || ''}</td>
-            <td style="text-align: right;">${expense.buying_amount || ''}</td>
-            <td style="text-align: right;">${expense.profit || ''}</td>
-          `;
-          expenseTableBody.appendChild(row);
-        });
-      }
-      
-      // Add default empty rows if both lists are empty
-      if (mergedExpenses1.length === 0 && expenses2.length === 0) {
-        const row1 = document.createElement('tr');
-        row1.innerHTML = `
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        `;
-        expenseTableBody.appendChild(row1);
-        
-        const row2 = document.createElement('tr');
-        row2.innerHTML = `
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        `;
-        expenseTableBody.appendChild(row2);
+      } else {
+        expenseTableBody.innerHTML = '<tr><td colspan="6" class="align-center">No data</td></tr>';
       }
     }
 
-    // Auto-print functionality (optional - uncomment if needed)
-    function autoPrint() {
-      const params = getUrlParams();
-      if (params.autoprint === 'true') {
-        setTimeout(() => {
-          window.print();
-        }, 500);
-      }
-    }
-
-    // Initialize document when page loads
-    window.addEventListener('DOMContentLoaded', () => {
-      populateDocument();
-      // autoPrint(); // Uncomment to enable auto-print
-    });
+    window.addEventListener('DOMContentLoaded', populateDocument);
   </script>
 </body>
 </html>
