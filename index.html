@@ -365,7 +365,7 @@
       // Merge expenses by description
       const mergedExpenses = {};
       
-      // Process expenses1 for selling amounts
+      // Process expenses1 - get selling amounts
       expenses1.forEach((expense) => {
         const desc = expense.description || '';
         if (!mergedExpenses[desc]) {
@@ -374,14 +374,19 @@
             vendor: expense.vendor || '',
             description: desc,
             selling_amount: 0,
-            buying_amount: 0,
-            profit: 0
+            buying_amount: 0
           };
         }
-        mergedExpenses[desc].selling_amount += parseFloat(expense.selling_amount) || 0;
+        const selling = parseFloat(expense.selling_amount);
+        if (!isNaN(selling)) {
+          mergedExpenses[desc].selling_amount += selling;
+        }
+        // Keep first date and vendor
+        if (!mergedExpenses[desc].date) mergedExpenses[desc].date = expense.date || '';
+        if (!mergedExpenses[desc].vendor) mergedExpenses[desc].vendor = expense.vendor || '';
       });
       
-      // Process expenses2 for buying amounts
+      // Process expenses2 - get buying amounts
       expenses2.forEach((expense) => {
         const desc = expense.description || '';
         if (!mergedExpenses[desc]) {
@@ -390,26 +395,27 @@
             vendor: expense.vendor || '',
             description: desc,
             selling_amount: 0,
-            buying_amount: 0,
-            profit: 0
+            buying_amount: 0
           };
         }
-        mergedExpenses[desc].buying_amount += parseFloat(expense.buying_amount) || 0;
-      });
-      
-      // Calculate profit for each merged expense
-      Object.values(mergedExpenses).forEach((expense) => {
-        expense.profit = expense.selling_amount - expense.buying_amount;
+        const buying = parseFloat(expense.buying_amount);
+        if (!isNaN(buying)) {
+          mergedExpenses[desc].buying_amount += buying;
+        }
+        // Keep first date and vendor if not set
+        if (!mergedExpenses[desc].date) mergedExpenses[desc].date = expense.date || '';
+        if (!mergedExpenses[desc].vendor) mergedExpenses[desc].vendor = expense.vendor || '';
       });
       
       // Render merged expenses
       if (Object.keys(mergedExpenses).length > 0) {
         Object.values(mergedExpenses).forEach((expense) => {
-          const row = document.createElement('tr');
-          const sellingDisplay = expense.selling_amount !== 0 ? expense.selling_amount : '';
-          const buyingDisplay = expense.buying_amount !== 0 ? expense.buying_amount : '';
-          const profitDisplay = expense.profit !== 0 ? expense.profit : '';
+          const profit = expense.selling_amount - expense.buying_amount;
+          const sellingDisplay = expense.selling_amount > 0 ? expense.selling_amount.toFixed(2) : '';
+          const buyingDisplay = expense.buying_amount > 0 ? expense.buying_amount.toFixed(2) : '';
+          const profitDisplay = profit !== 0 ? profit.toFixed(2) : '';
           
+          const row = document.createElement('tr');
           row.innerHTML = `
             <td style="text-align: center;">${expense.date}</td>
             <td style="text-align: left;">${expense.vendor}</td>
