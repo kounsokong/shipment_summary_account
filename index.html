@@ -362,67 +362,66 @@
       const expenses1 = parseJsonParam(params.expenses1 || '[]');
       const expenses2 = parseJsonParam(params.expenses2 || '[]');
       
-      // Add first list of expenses (merge duplicates by description)
-      if (expenses1.length > 0) {
-        const mergedExpenses = {};
-        
-        expenses1.forEach((expense) => {
-          const desc = expense.description || '';
-          if (mergedExpenses[desc]) {
-            // Merge amounts for duplicate descriptions
-            const selling = parseFloat(expense.selling_amount) || 0;
-            const buying = parseFloat(expense.buying_amount) || 0;
-            const profit = parseFloat(expense.profit) || 0;
-            
-            mergedExpenses[desc].selling_amount += selling;
-            mergedExpenses[desc].buying_amount += buying;
-            mergedExpenses[desc].profit += profit;
-          } else {
-            // First occurrence of this description
-            mergedExpenses[desc] = {
-              date: expense.date || '',
-              vendor: expense.vendor || '',
-              description: desc,
-              selling_amount: parseFloat(expense.selling_amount) || 0,
-              buying_amount: parseFloat(expense.buying_amount) || 0,
-              profit: parseFloat(expense.profit) || 0
-            };
-          }
-        });
-        
-        // Render merged expenses
+      // Merge expenses by description
+      const mergedExpenses = {};
+      
+      // Process expenses1 for selling amounts
+      expenses1.forEach((expense) => {
+        const desc = expense.description || '';
+        if (!mergedExpenses[desc]) {
+          mergedExpenses[desc] = {
+            date: expense.date || '',
+            vendor: expense.vendor || '',
+            description: desc,
+            selling_amount: 0,
+            buying_amount: 0,
+            profit: 0
+          };
+        }
+        mergedExpenses[desc].selling_amount += parseFloat(expense.selling_amount) || 0;
+      });
+      
+      // Process expenses2 for buying amounts
+      expenses2.forEach((expense) => {
+        const desc = expense.description || '';
+        if (!mergedExpenses[desc]) {
+          mergedExpenses[desc] = {
+            date: expense.date || '',
+            vendor: expense.vendor || '',
+            description: desc,
+            selling_amount: 0,
+            buying_amount: 0,
+            profit: 0
+          };
+        }
+        mergedExpenses[desc].buying_amount += parseFloat(expense.buying_amount) || 0;
+      });
+      
+      // Calculate profit for each merged expense
+      Object.values(mergedExpenses).forEach((expense) => {
+        expense.profit = expense.selling_amount - expense.buying_amount;
+      });
+      
+      // Render merged expenses
+      if (Object.keys(mergedExpenses).length > 0) {
         Object.values(mergedExpenses).forEach((expense) => {
           const row = document.createElement('tr');
+          const sellingDisplay = expense.selling_amount !== 0 ? expense.selling_amount : '';
+          const buyingDisplay = expense.buying_amount !== 0 ? expense.buying_amount : '';
+          const profitDisplay = expense.profit !== 0 ? expense.profit : '';
+          
           row.innerHTML = `
             <td style="text-align: center;">${expense.date}</td>
             <td style="text-align: left;">${expense.vendor}</td>
             <td style="text-align: left;">${expense.description}</td>
-            <td style="text-align: right;">${expense.selling_amount || ''}</td>
-            <td style="text-align: right;">${expense.buying_amount || ''}</td>
-            <td style="text-align: right;">${expense.profit || ''}</td>
+            <td style="text-align: right;">${sellingDisplay}</td>
+            <td style="text-align: right;">${buyingDisplay}</td>
+            <td style="text-align: right;">${profitDisplay}</td>
           `;
           expenseTableBody.appendChild(row);
         });
-      }
-      
-      // Add second list of expenses
-      if (expenses2.length > 0) {
-        expenses2.forEach((expense) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td style="text-align: center;">${expense.date || ''}</td>
-            <td style="text-align: left;">${expense.vendor || ''}</td>
-            <td style="text-align: left;">${expense.description || ''}</td>
-            <td style="text-align: right;">${expense.selling_amount || ''}</td>
-            <td style="text-align: right;">${expense.buying_amount || ''}</td>
-            <td style="text-align: right;">${expense.profit || ''}</td>
-          `;
-          expenseTableBody.appendChild(row);
-        });
-      }
-      
-      // Add default empty rows if both lists are empty
-      if (expenses1.length === 0 && expenses2.length === 0) {
+      } else {
+        // Add default empty rows if no expenses
         const row1 = document.createElement('tr');
         row1.innerHTML = `
           <td></td>
