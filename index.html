@@ -295,36 +295,34 @@
       expenses.forEach(expense => {
         const description = expense.description || '';
         
+        // Helper function to parse amounts from various formats
+        const parseAmount = (val) => {
+          if (!val || val === '') return 0;
+          // Remove currency symbols, commas, and spaces
+          const cleaned = String(val).replace(/[$,\s]/g, '');
+          const parsed = parseFloat(cleaned);
+          return isNaN(parsed) ? 0 : parsed;
+        };
+        
         if (mergedMap.has(description)) {
           // Merge with existing entry
           const existing = mergedMap.get(description);
-          
-          // Parse and clean amount values
-          const parseAmount = (val) => {
-            if (!val || val === '') return 0;
-            // Remove currency symbols, commas, and spaces
-            const cleaned = String(val).replace(/[$,\s]/g, '');
-            return parseFloat(cleaned) || 0;
-          };
-          
           existing.selling_amount += parseAmount(expense.selling_amount);
           existing.buying_amount += parseAmount(expense.buying_amount);
           existing.profit += parseAmount(expense.profit);
         } else {
-          // Add new entry
-          const parseAmount = (val) => {
-            if (!val || val === '') return 0;
-            const cleaned = String(val).replace(/[$,\s]/g, '');
-            return parseFloat(cleaned) || 0;
-          };
-          
+          // Add new entry - keep original values if they exist
           mergedMap.set(description, {
             date: expense.date || '',
             vendor: expense.vendor || '',
             description: description,
             selling_amount: parseAmount(expense.selling_amount),
             buying_amount: parseAmount(expense.buying_amount),
-            profit: parseAmount(expense.profit)
+            profit: parseAmount(expense.profit),
+            // Keep original string values for debugging
+            _original_selling: expense.selling_amount,
+            _original_buying: expense.buying_amount,
+            _original_profit: expense.profit
           });
         }
       });
@@ -413,18 +411,26 @@
       if (mergedExpenses1.length > 0) {
         mergedExpenses1.forEach((expense) => {
           const row = document.createElement('tr');
-          // Format amounts - show empty if 0, otherwise show value
-          const sellingDisplay = expense.selling_amount === 0 ? '' : expense.selling_amount.toFixed(2);
-          const buyingDisplay = expense.buying_amount === 0 ? '' : expense.buying_amount.toFixed(2);
-          const profitDisplay = expense.profit === 0 ? '' : expense.profit.toFixed(2);
+          
+          // Use original values if amounts are 0 after parsing
+          const sellingValue = expense.selling_amount !== 0 ? expense.selling_amount : expense._original_selling;
+          const buyingValue = expense.buying_amount !== 0 ? expense.buying_amount : expense._original_buying;
+          const profitValue = expense.profit !== 0 ? expense.profit : expense._original_profit;
+          
+          // Format display
+          const formatAmount = (val) => {
+            if (!val || val === '' || val === 0) return '';
+            if (typeof val === 'number') return val.toFixed(2);
+            return val; // Return original string if it's already formatted
+          };
           
           row.innerHTML = `
             <td style="text-align: center;">${expense.date}</td>
             <td style="text-align: left;">${expense.vendor}</td>
             <td style="text-align: left;">${expense.description}</td>
-            <td style="text-align: right;">${sellingDisplay}</td>
-            <td style="text-align: right;">${buyingDisplay}</td>
-            <td style="text-align: right;">${profitDisplay}</td>
+            <td style="text-align: right;">${formatAmount(sellingValue)}</td>
+            <td style="text-align: right;">${formatAmount(buyingValue)}</td>
+            <td style="text-align: right;">${formatAmount(profitValue)}</td>
           `;
           expenseTableBody.appendChild(row);
         });
