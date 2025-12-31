@@ -293,9 +293,13 @@
       const merged = [];
       const expenseMap = new Map();
 
+      // Debug: Log the data
+      console.log('expenses1:', expenses1);
+      console.log('expenses2:', expenses2);
+
       // Process expenses1 - sum up SELLING amounts by description
       expenses1.forEach(expense => {
-        const key = expense.description || '';
+        const key = (expense.description || '').trim();
         
         if (expenseMap.has(key)) {
           const existing = expenseMap.get(key);
@@ -315,9 +319,13 @@
         }
       });
 
+      console.log('After expense1 processing:', Array.from(expenseMap.entries()));
+
       // Process expenses2 - sum up BUYING amounts by description
       expenses2.forEach(expense => {
-        const key = expense.description || '';
+        const key = (expense.description || '').trim();
+        
+        console.log('Processing expense2 item:', expense, 'key:', key, 'has key?', expenseMap.has(key));
         
         if (expenseMap.has(key)) {
           // Add buying amount to existing entry
@@ -325,9 +333,11 @@
           const existingBuying = parseFloat((existing.buying_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           const newBuying = parseFloat((expense.buying_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           
+          console.log('Merging buying:', existingBuying, '+', newBuying);
           existing.buying_amount = (existingBuying + newBuying).toFixed(2);
         } else {
           // Create new entry with only buying amount
+          console.log('Creating new entry for expense2');
           expenseMap.set(key, {
             date: expense.date || '',
             vendor: expense.vendor || '',
@@ -338,6 +348,8 @@
           });
         }
       });
+
+      console.log('After expense2 processing:', Array.from(expenseMap.entries()));
 
       // Calculate profit for all entries
       expenseMap.forEach(expense => {
