@@ -288,6 +288,15 @@
       }
     }
 
+    // Function to parse amount values
+    function parseAmount(val) {
+      if (!val || val === '') return 0;
+      // Remove currency symbols, commas, and spaces
+      const cleaned = String(val).replace(/[$,\s]/g, '');
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
     // Function to merge duplicate expenses by description (item_name)
     function mergeExpensesByDescription(expenses) {
       const mergedMap = new Map();
@@ -295,23 +304,15 @@
       expenses.forEach(expense => {
         const description = expense.description || '';
         
-        // Helper function to parse amounts from various formats
-        const parseAmount = (val) => {
-          if (!val || val === '') return 0;
-          // Remove currency symbols, commas, and spaces
-          const cleaned = String(val).replace(/[$,\s]/g, '');
-          const parsed = parseFloat(cleaned);
-          return isNaN(parsed) ? 0 : parsed;
-        };
-        
         if (mergedMap.has(description)) {
-          // Merge with existing entry
+          // Merge with existing entry - sum the "amount" field
           const existing = mergedMap.get(description);
           existing.selling_amount += parseAmount(expense.selling_amount);
           existing.buying_amount += parseAmount(expense.buying_amount);
           existing.profit += parseAmount(expense.profit);
+          existing.amount += parseAmount(expense.amount);
         } else {
-          // Add new entry - keep original values if they exist
+          // Add new entry
           mergedMap.set(description, {
             date: expense.date || '',
             vendor: expense.vendor || '',
@@ -319,10 +320,7 @@
             selling_amount: parseAmount(expense.selling_amount),
             buying_amount: parseAmount(expense.buying_amount),
             profit: parseAmount(expense.profit),
-            // Keep original string values for debugging
-            _original_selling: expense.selling_amount,
-            _original_buying: expense.buying_amount,
-            _original_profit: expense.profit
+            amount: parseAmount(expense.amount)
           });
         }
       });
@@ -412,25 +410,34 @@
         mergedExpenses1.forEach((expense) => {
           const row = document.createElement('tr');
           
-          // Use original values if amounts are 0 after parsing
-          const sellingValue = expense.selling_amount !== 0 ? expense.selling_amount : expense._original_selling;
-          const buyingValue = expense.buying_amount !== 0 ? expense.buying_amount : expense._original_buying;
-          const profitValue = expense.profit !== 0 ? expense.profit : expense._original_profit;
+          // Determine which amount to display based on data availability
+          let sellingDisplay = '';
+          let buyingDisplay = '';
+          let profitDisplay = '';
           
-          // Format display
-          const formatAmount = (val) => {
-            if (!val || val === '' || val === 0) return '';
-            if (typeof val === 'number') return val.toFixed(2);
-            return val; // Return original string if it's already formatted
-          };
+          // Check if we have selling_amount, buying_amount, profit fields
+          if (expense.selling_amount !== 0) {
+            sellingDisplay = expense.selling_amount.toFixed(2);
+          }
+          if (expense.buying_amount !== 0) {
+            buyingDisplay = expense.buying_amount.toFixed(2);
+          }
+          if (expense.profit !== 0) {
+            profitDisplay = expense.profit.toFixed(2);
+          }
+          
+          // If amount field exists and is non-zero, use it for the appropriate column
+          if (expense.amount !== 0 && sellingDisplay === '') {
+            sellingDisplay = expense.amount.toFixed(2);
+          }
           
           row.innerHTML = `
             <td style="text-align: center;">${expense.date}</td>
             <td style="text-align: left;">${expense.vendor}</td>
             <td style="text-align: left;">${expense.description}</td>
-            <td style="text-align: right;">${formatAmount(sellingValue)}</td>
-            <td style="text-align: right;">${formatAmount(buyingValue)}</td>
-            <td style="text-align: right;">${formatAmount(profitValue)}</td>
+            <td style="text-align: right;">${sellingDisplay}</td>
+            <td style="text-align: right;">${buyingDisplay}</td>
+            <td style="text-align: right;">${profitDisplay}</td>
           `;
           expenseTableBody.appendChild(row);
         });
