@@ -293,31 +293,46 @@
       const merged = [];
       const expenseMap = new Map();
 
-      // Process all expenses from both lists
-      const allExpenses = [...expenses1, ...expenses2];
+      // Process expenses1 first
+      expenses1.forEach(expense => {
+        const key = `${expense.date || ''}|${expense.vendor || ''}|${expense.description || ''}`;
+        
+        expenseMap.set(key, {
+          date: expense.date || '',
+          vendor: expense.vendor || '',
+          description: expense.description || '',
+          selling_amount: expense.selling_amount || '',
+          buying_amount: expense.buying_amount || '',
+          profit: expense.profit || '',
+          buying_from_expense1: expense.buying_amount || ''
+        });
+      });
 
-      allExpenses.forEach(expense => {
+      // Process expenses2 and merge
+      expenses2.forEach(expense => {
         const key = `${expense.date || ''}|${expense.vendor || ''}|${expense.description || ''}`;
         
         if (expenseMap.has(key)) {
-          // Merge with existing entry
+          // Merge with existing entry from expense1
           const existing = expenseMap.get(key);
           
-          // Sum up numeric values (remove non-numeric characters for calculation)
+          // Sum up selling amounts
           const existingSelling = parseFloat((existing.selling_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           const newSelling = parseFloat((expense.selling_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           
-          const existingBuying = parseFloat((existing.buying_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
-          const newBuying = parseFloat((expense.buying_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
+          // Get buying_amount from expense1, buying_amount from expense2
+          const buyingFromExpense1 = parseFloat((existing.buying_from_expense1 || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
+          const buyingFromExpense2 = parseFloat((expense.buying_amount || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
           
-          const existingProfit = parseFloat((existing.profit || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
-          const newProfit = parseFloat((expense.profit || '0').toString().replace(/[^0-9.-]/g, '')) || 0;
+          // Calculate new profit (selling - buying from expense2)
+          const totalSelling = existingSelling + newSelling;
+          const profit = totalSelling - buyingFromExpense2;
           
-          existing.selling_amount = (existingSelling + newSelling).toFixed(2);
-          existing.buying_amount = (existingBuying + newBuying).toFixed(2);
-          existing.profit = (existingProfit + newProfit).toFixed(2);
+          existing.selling_amount = totalSelling.toFixed(2);
+          existing.buying_amount = buyingFromExpense2.toFixed(2);
+          existing.profit = profit.toFixed(2);
         } else {
-          // Add new entry
+          // Add new entry from expense2
           expenseMap.set(key, {
             date: expense.date || '',
             vendor: expense.vendor || '',
